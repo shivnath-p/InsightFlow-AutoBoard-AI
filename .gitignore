@@ -1,0 +1,14 @@
+.env
+.env.*
+!.env.example
+*.db
+*.sqlite3
+backend/data/
+data/
+*.parquet
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+node_modules/
+dist/

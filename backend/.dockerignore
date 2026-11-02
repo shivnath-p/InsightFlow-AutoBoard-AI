@@ -1,0 +1,10 @@
+data/
+tests/
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+.env
+.env.*
+*.db
+Dockerfile

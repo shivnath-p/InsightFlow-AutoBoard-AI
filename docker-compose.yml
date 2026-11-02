@@ -1,0 +1,35 @@
+services:
+  backend:
+    build: ./backend
+    # Published on localhost only. Put a TLS-terminating reverse proxy in front for real use.
+    ports: ["127.0.0.1:8000:8000"]
+    env_file:
+      - path: .env
+        required: false          # values below still apply if you have not created .env yet
+    environment:
+      DATA_DIR: /app/data        # SQLite DB, raw uploads and Parquet all live in this volume
+      CORS_ORIGINS: http://localhost:5173
+      ENVIRONMENT: ${ENVIRONMENT:-production}
+      # Refuse to start without a real secret instead of silently using a random one
+      SECRET_KEY: ${SECRET_KEY:?Set SECRET_KEY in .env (see .env.example)}
+    volumes:
+      - backend-data:/app/data
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    restart: unless-stopped
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: http://localhost:8000
+    ports: ["127.0.0.1:5173:8080"]
+    environment:
+      API_ORIGIN: http://localhost:8000   # allowed in the Content-Security-Policy connect-src
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    depends_on: [backend]
+    restart: unless-stopped
+volumes:
+  backend-data:
